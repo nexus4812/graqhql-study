@@ -1,36 +1,53 @@
 import {ApolloProvider} from "react-apollo";
 import client from './client';
 import {Query} from "react-apollo";
-import {ME} from "./graqhql";
+import {SEARCH_REPOSITORIES} from "./graqhql";
 
+import React, { useState } from 'react';
+
+const DEFAULT_STATE = {
+    first: 5,
+    after: null,
+    last: null,
+    before: null,
+    query: "フロントエンドエンジニア"
+};
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
+    const [state, setState] = useState(DEFAULT_STATE);
 
-          <ApolloProvider client={client}>
-              <div>
-                  hi
-              </div>
+    const {first, after, last, before, query} = state;
 
-              <Query query={ME}>
-                  {
-                      ({loading, error, data}) => {
-                          console.log(loading);
+    return (
+        <div className="App">
+            <header className="App-header">
 
-                          if(loading) return 'Loading...';
-                          if(error) return  error.message;
+                <ApolloProvider client={client}>
+                    <div>
+                        hi
+                    </div>
 
-                          console.log(data.user);
-                          return <img alt='avatarUrl' src={data.user.avatarUrl} />
-                      }
-                  }
-              </Query>
-          </ApolloProvider>
-      </header>
-    </div>
-  );
+                    <Query
+                        query= {SEARCH_REPOSITORIES}
+                        variables= {{first, after, last, before, query}}
+                    >
+                        {
+                            ({loading, error, data}) => {
+                                console.log(loading);
+
+                                if (loading) return 'Loading...';
+                                if (error) return error.message;
+
+
+                                console.log(data);
+                                return ''
+                            }
+                        }
+                    </Query>
+                </ApolloProvider>
+            </header>
+        </div>
+    );
 }
 
 export default App;
