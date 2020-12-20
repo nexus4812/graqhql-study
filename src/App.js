@@ -1,17 +1,8 @@
 import {ApolloProvider} from "react-apollo";
 import client from './client';
-
-import gql from 'graphql-tag'
 import {Query} from "react-apollo";
+import {ME} from "./graqhql";
 
-export const ME = gql`
-  query me {
-    user(login: "nexus4812") {
-      name
-      avatarUrl
-    }
-  }
-`;
 
 function App() {
   return (
@@ -26,6 +17,8 @@ function App() {
               <Query query={ME}>
                   {
                       ({loading, error, data}) => {
+                          console.log(loading);
+
                           if(loading) return 'Loading...';
                           if(error) return  error.message;
 
