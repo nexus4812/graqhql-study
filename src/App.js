@@ -45,7 +45,11 @@ function App() {
                                 if (loading) return 'Loading...';
                                 if (error) return error.message;
                                 console.log(data);
-                                return ''
+
+                                const repositoryCount = data.search.repositoryCount;
+                                const repositoryUnit = repositoryCount % 2 !== 1 ? 'Repositories':'Repository';
+                                const title = `Github search result ${repositoryCount} ${repositoryUnit}`;
+                                return <h2>{title}</h2>
                             }
                         }
                     </Query>
