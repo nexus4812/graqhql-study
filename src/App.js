@@ -13,10 +13,19 @@ const DEFAULT_STATE = {
     query: "フロントエンドエンジニア"
 };
 
+
+function Title(prop) {
+    const repositoryCount = prop.data.search.repositoryCount;
+    const repositoryUnit = repositoryCount % 2 !== 1 ? 'Repositories' : 'Repository';
+    const title = `Github search result ${repositoryCount} ${repositoryUnit}`;
+    return <h2>{title}</h2>
+}
+
 function App() {
     const [state, setState] = useState(DEFAULT_STATE);
 
     const {first, after, last, before, query} = state;
+
 
     const handleChange = (event) => {
         setState({
@@ -24,7 +33,6 @@ function App() {
                 query: event.target.value
             }
         );
-        console.log(event.target.value);
     };
 
     return (
@@ -44,12 +52,11 @@ function App() {
                             ({loading, error, data}) => {
                                 if (loading) return 'Loading...';
                                 if (error) return error.message;
-                                console.log(data);
-
-                                const repositoryCount = data.search.repositoryCount;
-                                const repositoryUnit = repositoryCount % 2 !== 1 ? 'Repositories':'Repository';
-                                const title = `Github search result ${repositoryCount} ${repositoryUnit}`;
-                                return <h2>{title}</h2>
+                                return (
+                                    <React.Fragment>
+                                        <Title data={data}/>
+                                    </React.Fragment>
+                                );
                             }
                         }
                     </Query>
