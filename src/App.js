@@ -21,6 +21,22 @@ function Title(prop) {
     return <h2>{title}</h2>
 }
 
+function Items(prop) {
+    return (
+        <ul>
+            {
+                prop.edges.map((edge) => (
+                        <li>
+                            {console.log(edge.node.url)}
+                            <a href={edge.node.url} key={edge.node.id} target="_brank">{edge.node.name}</a>
+                        </li>
+                    )
+                )
+            }
+        </ul>
+    );
+}
+
 function App() {
     const [state, setState] = useState(DEFAULT_STATE);
 
@@ -55,6 +71,7 @@ function App() {
                                 return (
                                     <React.Fragment>
                                         <Title data={data}/>
+                                        <Items edges={data.search.edges} />
                                     </React.Fragment>
                                 );
                             }
