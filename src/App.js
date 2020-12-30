@@ -5,8 +5,11 @@ import {SEARCH_REPOSITORIES} from "./graqhql";
 
 import React, {useState} from 'react';
 
+
+const PER_PAGE = 15;
+
 const DEFAULT_STATE = {
-    first: 5,
+    first: PER_PAGE,
     after: null,
     last: null,
     before: null,
@@ -15,20 +18,22 @@ const DEFAULT_STATE = {
 
 
 function Title(prop) {
-    const repositoryCount = prop.data.search.repositoryCount;
+    const repositoryCount = prop.repositoryCount;
     const repositoryUnit = repositoryCount % 2 !== 1 ? 'Repositories' : 'Repository';
-    const title = `Github search result ${repositoryCount} ${repositoryUnit}`;
-    return <h2>{title}</h2>
+
+    return <h2>{`Github search result ${repositoryCount} ${repositoryUnit}`}</h2>
 }
 
 function Items(prop) {
+    const edges = prop.edges;
+
     return (
         <ul>
             {
-                prop.edges.map((edge) => (
-                        <li>
+                edges.map((edge) => (
+                        <li key={edge.node.id}>
                             {console.log(edge.node.url)}
-                            <a href={edge.node.url} key={edge.node.id} target="_brank">{edge.node.name}</a>
+                            <a href={edge.node.url} target="_brank">{edge.node.name}</a>
                         </li>
                     )
                 )
@@ -37,11 +42,59 @@ function Items(prop) {
     );
 }
 
+function Paginate(prop) {
+    const state = prop.state;
+    const setState = prop.setState;
+    const {endCursor, hasNextPage, hasPreviousPage, startCursor} = prop.pageInfo;
+
+    const nextClickHandle = () => setState({
+        first: PER_PAGE,
+        after: endCursor,
+        last: null,
+        before: null,
+        query: state.query
+    });
+
+    const previousClickHandle = () => setState({
+        first: null,
+        after: null,
+        last: PER_PAGE,
+        before: startCursor,
+        query: state.query
+    });
+
+    return (<>
+            {
+                hasPreviousPage ?
+                    <button onClick={previousClickHandle}> Previous </button>
+                    :
+                    null
+            }
+            {
+                hasNextPage ?
+                    <button onClick={nextClickHandle}> Next </button>
+                    :
+                    null
+            }
+        </>
+    );
+}
+
+function Contents(prop) {
+    const {edges, pageInfo, repositoryCount} = prop.data.search;
+    return (
+        <>
+            <Title repositoryCount={repositoryCount}/>
+            <Items edges={edges}/>
+            <Paginate pageInfo={pageInfo} state={prop.state} setState={prop.setState}/>
+        </>
+    );
+}
+
 function App() {
     const [state, setState] = useState(DEFAULT_STATE);
 
     const {first, after, last, before, query} = state;
-
 
     const handleChange = (event) => {
         setState({
@@ -68,12 +121,7 @@ function App() {
                             ({loading, error, data}) => {
                                 if (loading) return 'Loading...';
                                 if (error) return error.message;
-                                return (
-                                    <React.Fragment>
-                                        <Title data={data}/>
-                                        <Items edges={data.search.edges} />
-                                    </React.Fragment>
-                                );
+                                return (<Contents data={data} state={state} setState={setState}/>);
                             }
                         }
                     </Query>
