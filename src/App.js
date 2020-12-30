@@ -26,20 +26,32 @@ function Title(prop) {
 
 function Items(prop) {
     const edges = prop.edges;
-
     return (
         <ul>
             {
                 edges.map((edge) => (
-                        <li key={edge.node.id}>
-                            {console.log(edge.node.url)}
-                            <a href={edge.node.url} target="_brank">{edge.node.name}</a>
-                        </li>
+                        <Item node={edge.node}/>
                     )
                 )
             }
         </ul>
     );
+}
+
+function Item(prop)  {
+    const {id, name, stargazers, url} = prop.node;
+
+    return (
+        <li key={id}>
+            <a href={url} target="_brank">{name}</a><Star stargazers={stargazers} />
+        </li>
+    );
+}
+
+function Star(prop) {
+    const {totalCount} = prop.stargazers;
+
+    return (<button> {totalCount} stars </button>);
 }
 
 function Paginate(prop) {
