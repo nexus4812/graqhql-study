@@ -1,7 +1,7 @@
 import {ApolloProvider} from "react-apollo";
 import client from './client';
-import {Query} from "react-apollo";
-import {SEARCH_REPOSITORIES} from "./graqhql";
+import {Query, Mutation} from "react-apollo";
+import {SEARCH_REPOSITORIES, ADD_STAR} from "./graqhql";
 
 import React, {useState} from 'react';
 
@@ -17,41 +17,41 @@ const DEFAULT_STATE = {
 };
 
 
-function Title(prop) {
-    const repositoryCount = prop.repositoryCount;
-    const repositoryUnit = repositoryCount % 2 !== 1 ? 'Repositories' : 'Repository';
+function Title({repositoryCount}) {
+    const repositoryUnit = repositoryCount !== 1 ? 'Repositories' : 'Repository';
 
     return <h2>{`Github search result ${repositoryCount} ${repositoryUnit}`}</h2>
 }
 
-function Items(prop) {
-    const edges = prop.edges;
+function Items({edges}) {
     return (
         <ul>
-            {
-                edges.map((edge) => (
-                        <Item node={edge.node}/>
-                    )
-                )
-            }
+            {edges.map(edge => <Item node={edge.node} key={edge.node.id}/>)}
         </ul>
     );
 }
 
-function Item(prop)  {
-    const {id, name, stargazers, url} = prop.node;
+function Item({node}) {
+    const {id, name, stargazers, url, viewerHasStarred} = node;
+    const {totalCount} = stargazers;
+
+    const StarStatus = ({addStar}) => (
+        <button onClick={() => {
+            addStar({variables: {input: {starrableId: id}}})
+        }}> {totalCount} stars | {viewerHasStarred ? 'starred' : ' - '} </button>
+    );
 
     return (
-        <li key={id}>
-            <a href={url} target="_brank">{name}</a><Star stargazers={stargazers} />
+        <li>
+            <a href={url} target="_brank">{name}</a>
+
+            <Mutation mutation={ADD_STAR}>
+                {
+                    addStar => <StarStatus addStar={addStar}/>
+                }
+            </Mutation>
         </li>
     );
-}
-
-function Star(prop) {
-    const {totalCount} = prop.stargazers;
-
-    return (<button> {totalCount} stars </button>);
 }
 
 function Paginate(prop) {
