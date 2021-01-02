@@ -1,7 +1,7 @@
 import {ApolloProvider} from "react-apollo";
 import client from './client';
 import {Query, Mutation} from "react-apollo";
-import {SEARCH_REPOSITORIES, ADD_STAR} from "./graqhql";
+import {SEARCH_REPOSITORIES, ADD_STAR, REMOVE_STAR} from "./graqhql";
 
 import React, {useState} from 'react';
 
@@ -45,7 +45,7 @@ function Item({node}) {
         <li>
             <a href={url} target="_brank">{name}</a>
 
-            <Mutation mutation={ADD_STAR}>
+            <Mutation mutation={viewerHasStarred ? REMOVE_STAR : ADD_STAR }>
                 {
                     addStar => <StarStatus addStar={addStar}/>
                 }
